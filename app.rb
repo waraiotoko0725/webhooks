@@ -1,8 +1,17 @@
 require 'sinatra'
 require 'sinatra/reloader'
+require 'logger'
+require 'json'
+
+set :environment, :production
+
+logger = Logger.new('/var/tmp/sinatra.log')
 
 get '/' do
-  branch = "20160521_hkobayashi_test"
+  http_headers = request.env.select { |k, v| k.start_with?('HTTP_') }
+  logger.info http_headers
+  payload = JSON.parse(params[:payload])
+  branch = payload["ref"][/refs\/heads\/(.*)/, 1]
   app_dir = "/var/www/dev-lavida"
 
   if !(name = branch[/\d{4,10}_(hkobayashi|kyaegashi|hsuzuki|hmurano|zynas)/, 1]).nil?
