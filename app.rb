@@ -1,33 +1,46 @@
-require 'sinatra'
+require 'rubygems'
+require 'sinatra/base'
 require 'sinatra/reloader'
 require 'logger'
 require 'json'
 
-set :environment, :production
+logger = Logger.new('sinatra.log')
 
-logger = Logger.new('/var/tmp/sinatra.log')
+class App < Sinatra::Base
 
-get '/' do
-  http_headers = request.env.select { |k, v| k.start_with?('HTTP_') }
-  logger.info http_headers
-  payload = JSON.parse(params[:payload])
-  branch = payload["ref"][/refs\/heads\/(.*)/, 1]
-  app_dir = "/var/www/dev-lavida"
+  set :environment, :production
 
-  if !(name = branch[/\d{4,10}_(hkobayashi|kyaegashi|hsuzuki|hmurano|zynas)/, 1]).nil?
-    app_dir = app_dir << "_" << name
-  elsif branch != "master" then
-    # not deploy branch
-    return "branch name is not matched. " << branch
+  post '/' do
+    http_headers = request.env.select { |k, v| k.start_with?('HTTP_') }
+    logger.info http_headers
+    payload = JSON.parse(params[:payload])
+    branch = payload["ref"][/refs\/heads\/(.*)/, 1]
+    app_dir = "/var/www/dev-lavida"
+
+    if !(name = branch[/\d{4,10}_(hkobayashi|kyaegashi|hsuzuki|hmurano|zynas|tyamamoto)/, 1]).nil?
+      app_dir = app_dir << "_" << name
+    elsif branch != "master" then
+      # not deploy branch
+      return "branch name is not matched. " << branch
+    end
+
+    # repository  check
+    return "not a git repository." if `cd #{app_dir} && ls -la | grep ".git"`.empty?
+
+    result = ""
+    # checkout brach and pull branch
+    Dir.chdir(app_dir) do
+      `git checkout -b #{branch}` if `git branch | grep "*" | grep #{branch}`.empty?
+      result = `git pull origin #{branch}`
+    end
+
+    return "dir: " << app_dir << "\n" << "branch: " << branch << "\n" << result
   end
 
-  # repository  check
-  return "not a git repository." if `cd #{app_dir} && ls -la | grep ".git"`.empty?
-
-  # checkout brach and pull branch
-  Dir.chdir(app_dir){
-    `git checkout -b #{branch}` if `git branch | grep "*" | grep #{branch}`.empty?
-    return "dir: " << app_dir << "\n" << "branch: " << branch << "\n" << `git pull origin #{branch}`
-  }
+  get '/hello' do
+    'Hello!'
+  end
 
 end
+
+App.run!
