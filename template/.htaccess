@@ -1,0 +1,27 @@
+SetEnv APPLICATION_ENV development
+SetEnv FRAMEWORK_PATH /var/www/framework
+SetEnv APPLICATION_PATH /var/www/dev.comsuite.jp/BRANCH_NAME/application
+
+RewriteEngine On
+RewriteBase /
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{HTTP_USER_AGENT} ^.*(DoCoMo|KDDI|DDIPOKET|UP.Browser|J-PHONE|Vodafone|SoftBank|Googlebot-Mobile).*$
+RewriteRule .* mobile.html
+
+RewriteCond %{REQUEST_FILENAME} -s [OR]
+RewriteCond %{REQUEST_FILENAME} -l [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ - [NC,L]
+RewriteRule ^.*$ index.php [NC,L]
+
+ErrorDocument 403 /error
+
+php_flag magic_quotes_gpc off
+php_flag register_globals off
+php_flag last_modified on
+
+#AuthType Basic
+#AuthName "cs2"
+#AuthUserFile "/var/www/github-cs2/public/.htpasswd"
+#Require valid-user
