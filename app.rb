@@ -10,7 +10,7 @@ class App < Sinatra::Base
 
   set :environment, :production
 
-  post '/' do
+  post '/community' do
     http_headers = request.env.select { |k, v| k.start_with?('HTTP_') }
     logger.info http_headers
     payload = JSON.parse(params[:payload])
@@ -59,6 +59,28 @@ class App < Sinatra::Base
     end
 
     return "dir: #{app_dir}\nbranch: #{branch}\result: #{result}"
+  end
+
+  post '/base' do
+    http_headers = request.env.select { |k, v| k.start_with?('HTTP_') }
+    logger.info http_headers
+    payload = JSON.parse(params[:payload])
+    return "payload is null." if payload.empty?
+
+    branch = payload["ref"][/refs\/heads\/(.*)/, 1]
+    if branch === "master" then
+      # merge & push
+      return `/bin/bash /home/git/_scripts/merge_lavida_library_assets_from_base.sh -y`
+    else
+      #work_dir = "/home/git/webhooks/work_repo/"
+      #app_dir = "/var/www/dev-community-lavida/"
+      #library_dir = "application/library/Lavida/"
+      #Dir.chdir(work_dir) do
+      #  `git checkout -b #{branch}` if `git branch | grep "*" | grep #{branch}`.empty?
+      #  `git pull origin #{branch}`
+      #end
+      return `not sync`
+    end
   end
 
 end
