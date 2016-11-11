@@ -1,9 +1,41 @@
 SetEnv APPLICATION_ENV development
 SetEnv FRAMEWORK_PATH /var/www/framework
-SetEnv APPLICATION_PATH /var/www/dev.comsuite.jp/BRANCH_NAME/application
+SetEnv APPLICATION_PATH /var/www/dev-community-lavida_virtual/BRANCH_NAME/application
 
 RewriteEngine On
 RewriteBase /
+
+RewriteCond %{REQUEST_URI} !/_error/503.html
+RewriteCond %{HTTP:X-Forwarded-For} !218.219.149.75
+RewriteCond %{HTTP:X-Forwarded-For} !218.219.148.44
+RewriteCond %{HTTP:X-Forwarded-For} !210.171.169.128
+RewriteCond %{HTTP:X-Forwarded-For} !52.196.25.39
+RewriteCond %{HTTP:X-Forwarded-For} !52.192.32.150
+RewriteCond %{HTTP:X-Forwarded-For} !54.64.29.69
+RewriteCond %{HTTP:X-Forwarded-For} !114.148.241.41
+RewriteCond %{HTTP:X-Forwarded-For} !113.144.27.126
+RewriteCond %{HTTP:X-Forwarded-For} !124.41.93.202
+RewriteCond %{HTTP:X-Forwarded-For} !210.171.169.131
+RewriteCond %{HTTP:X-Forwarded-For} !116.220.193.59
+RewriteCond %{HTTP:X-Forwarded-For} !106.185.88.96
+RewriteCond %{HTTP:X-Forwarded-For} !218.221.128.56
+RewriteCond %{HTTP:X-Forwarded-For} !114.186.71.66
+RewriteCond %{HTTP:X-Forwarded-For} !126.227.248.147
+RewriteCond %{HTTP:X-Forwarded-For} !116.220.193.59
+RewriteCond %{HTTP:X-Forwarded-For} !119.170.40.225
+RewriteCond %{HTTP:X-Forwarded-For} !52.69.137.208
+RewriteCond %{HTTP:X-Forwarded-For} !114.146.157.249
+RewriteCond %{HTTP:X-Forwarded-For} !123.225.120.17
+RewriteCond %{HTTP:X-Forwarded-For} !126.145.27.37
+RewriteCond %{HTTP:X-Forwarded-For} !210.128.197.92
+RewriteCond %{HTTP:X-Forwarded-For} !118.21.117.224
+RewriteCond %{HTTP:X-Forwarded-For} !58.183.198.7
+RewriteCond %{HTTP:X-Forwarded-For} !157.250.87.208
+RewriteCond %{HTTP:X-Forwarded-For} !113.43.17.106
+RewriteCond %{HTTP:X-Forwarded-For} !118.70.133.151
+RewriteCond %{HTTP:X-Forwarded-For} !61.115.100.99
+RewriteCond %{HTTP:X-Forwarded-For} !124.41.127.229
+RewriteRule ^.*$ - [R=403,L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{HTTP_USER_AGENT} ^.*(DoCoMo|KDDI|DDIPOKET|UP.Browser|J-PHONE|Vodafone|SoftBank|Googlebot-Mobile).*$
@@ -20,8 +52,3 @@ ErrorDocument 403 /error
 php_flag magic_quotes_gpc off
 php_flag register_globals off
 php_flag last_modified on
-
-#AuthType Basic
-#AuthName "cs2"
-#AuthUserFile "/var/www/github-cs2/public/.htpasswd"
-#Require valid-user
