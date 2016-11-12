@@ -24,7 +24,7 @@ class App < Sinatra::Base
   end
 
   def App.deploy(branch)
-    return "branch is null" if branch.blank?
+    return "branch is null" if branch.nil?
 
     script_dir = Dir.pwd
     vhost_dir = "/var/www/dev-lavida_virtual/"
