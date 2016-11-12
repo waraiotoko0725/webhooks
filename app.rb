@@ -10,7 +10,7 @@ class App < Sinatra::Base
 
   set :environment, :production
 
-  post '/community' do
+  post '/' do
     http_headers = request.env.select { |k, v| k.start_with?('HTTP_') }
     logger.info http_headers
     payload = JSON.parse(params[:payload])
@@ -25,16 +25,10 @@ class App < Sinatra::Base
 
   def App.deploy(branch)
     script_dir = Dir.pwd
-    vhost_dir = "/var/www/dev-community-lavida_virtual/"
+    vhost_dir = "/var/www/dev-lavida_virtual/"
 
-    # check branch (exclude develop)
-    excludeBranch = ["develop"]
-    if excludeBranch.include?(branch)
-      return "This branch is not deployed. branch: #{branch}"
-    end
-
-    if branch == "master"
-      vhost_dir = "/var/www/dev-community-lavida/"
+    if branch == "develop"
+      vhost_dir = "/var/www/dev-lavida/"
     end
 
     app_dir = vhost_dir + branch
@@ -48,39 +42,20 @@ class App < Sinatra::Base
     else
       # not exists
       Dir.chdir(vhost_dir) do
-        `git clone -b #{branch} git@github.com:e-life/lavida-community.git ./#{branch}`
+        `git clone -b #{branch} git@github.com:e-life/lavida.git ./#{branch}`
         `chmod -R 777 #{app_dir}/application/var/`
         `chmod -R 777 #{app_dir}/public/_var/`
-        `sed -i -e "s/dev\.community\.lavida\.jp/#{branch}\.dev\.community\.lavida\.jp/g" #{app_dir}/application/configs/application.ini`
+        `sed -i -e "s/dev\.lavida\.jp/#{branch}\.dev\.lavida\.jp/g" #{app_dir}/application/configs/application.ini`
         `cp #{script_dir}/template/.htaccess #{app_dir}/public/`
         `sed -i -e "s/BRANCH_NAME/#{branch}/g" #{app_dir}/public/.htaccess`
+
+        # TODO create database
+
         result = "clone and checkout #{branch}"
       end
     end
 
     return "dir: #{app_dir}\nbranch: #{branch}\result: #{result}"
-  end
-
-  post '/base' do
-    http_headers = request.env.select { |k, v| k.start_with?('HTTP_') }
-    logger.info http_headers
-    payload = JSON.parse(params[:payload])
-    return "payload is null." if payload.empty?
-
-    branch = payload["ref"][/refs\/heads\/(.*)/, 1]
-    if branch === "master" then
-      # merge & push
-      return `/bin/bash /home/git/_scripts/merge_lavida_library_assets_from_base.sh -y`
-    else
-      #work_dir = "/home/git/webhooks/work_repo/"
-      #app_dir = "/var/www/dev-community-lavida/"
-      #library_dir = "application/library/Lavida/"
-      #Dir.chdir(work_dir) do
-      #  `git checkout -b #{branch}` if `git branch | grep "*" | grep #{branch}`.empty?
-      #  `git pull origin #{branch}`
-      #end
-      return `not sync`
-    end
   end
 
 end
