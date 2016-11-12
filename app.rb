@@ -24,8 +24,11 @@ class App < Sinatra::Base
   end
 
   def App.deploy(branch)
+    return "branch is null" if branch.nil?
+
     script_dir = Dir.pwd
     vhost_dir = "/var/www/dev-community-lavida_virtual/"
+    app_dir = vhost_dir + branch
 
     # check branch (exclude develop)
     excludeBranch = ["develop"]
@@ -34,10 +37,9 @@ class App < Sinatra::Base
     end
 
     if branch == "master"
-      vhost_dir = "/var/www/dev-community-lavida/"
+      app_dir = "/var/www/dev-community-lavida/"
     end
 
-    app_dir = vhost_dir + branch
     result = ""
     # dir check branch
     if Dir.exist?(app_dir)
