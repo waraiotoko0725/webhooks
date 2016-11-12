@@ -26,12 +26,12 @@ class App < Sinatra::Base
   def App.deploy(branch)
     script_dir = Dir.pwd
     vhost_dir = "/var/www/dev-lavida_virtual/"
+    app_dir = vhost_dir + branch
 
     if branch == "develop"
-      vhost_dir = "/var/www/dev-lavida/"
+      app_dir = "/var/www/dev-lavida/"
     end
 
-    app_dir = vhost_dir + branch
     result = ""
     # dir check branch
     if Dir.exist?(app_dir)
