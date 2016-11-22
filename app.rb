@@ -24,7 +24,7 @@ class App < Sinatra::Base
   end
 
   def App.deploy(branch)
-    script_dir = Dir.pwd
+    script_dir = File.expand_path(File.dirname(__FILE__))
     vhost_dir = "/var/www/dev.comsuite.jp/"
 
     # check branch (exclude develop,master)
